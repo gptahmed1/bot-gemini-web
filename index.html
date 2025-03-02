@@ -1,0 +1,2392 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Bot Manager</title>
+    <style>
+        :root {
+            --primary-color: #0088cc;
+            --secondary-color: #4CAF50;
+            --accent-color: #FF5252;
+            --border-radius: 8px;
+            --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo img {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .setup-panel {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+        
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .help-text {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background-color: #3367D6;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background-color: var(--accent-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #D62516;
+        }
+        
+        .btn-success {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #2D9047;
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .advanced-options {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .collapsible {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
+        .collapsible-content {
+            display: none;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+        }
+        
+        .status-panel {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .bot-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            background-color: #f5f5f5;
+        }
+        
+        .status-indicator {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: #ccc;
+        }
+        
+        .status-active {
+            background-color: var(--secondary-color);
+        }
+        
+        .status-error {
+            background-color: var(--accent-color);
+        }
+        
+        .logs-container {
+            background-color: #2d2d2d;
+            color: #f8f8f8;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            font-family: monospace;
+            height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+        
+        .log-info {
+            color: #64B5F6;
+        }
+        
+        .log-success {
+            color: #81C784;
+        }
+        
+        .log-error {
+            color: #E57373;
+        }
+        
+        .log-warning {
+            color: #FFD54F;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .feature-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: var(--border-radius);
+        }
+        
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--primary-color);
+        }
+        
+        .memory-settings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .webhook-status {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: var(--border-radius);
+        }
+        
+        .webhook-url {
+            font-family: monospace;
+            word-break: break-all;
+            padding: 10px;
+            background-color: #eee;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        .bot-list {
+            margin-top: 20px;
+        }
+        
+        .bot-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: var(--border-radius);
+            margin-bottom: 10px;
+        }
+        
+        .bot-info {
+            flex: 1;
+        }
+        
+        .bot-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-close {
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            padding: 20px 0;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .bot-inactive {
+            opacity: 0.6;
+            background-color: #f0f0f0;
+        }
+        
+        .bot-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .stats-panel {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: var(--border-radius);
+        }
+        
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .stats-value {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .btn-export {
+            background-color: #17a2b8;
+        }
+        
+        .btn-export:hover {
+            background-color: #138496;
+        }
+        
+        .btn-import {
+            background-color: #6f42c1;
+        }
+        
+        .btn-import:hover {
+            background-color: #5e37a6;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+        
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .webhook-guide {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .webhook-guide h4 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        
+        .webhook-guide ol {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+        
+        .webhook-guide li {
+            margin-bottom: 8px;
+        }
+        
+        .webhook-guide code {
+            background-color: #f1f1f1;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        
+        .test-connection-btn {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .test-connection-btn:hover {
+            background-color: #5a6268;
+        }
+        
+        .status-checking {
+            background-color: #FFC107;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzQyODVGNCIgZD0iTTIyLjIyLDEwLjg0NWMtMC4zOTItMS43ODUtMS42MzctMy4yMDQtMy4zNDQtMy43MzRjLTEuNzA3LTAuNTMtMy42MDQtMC4xMDctNC45MjIsMS4wODhjLTEuMzE4LDEuMTk2LTEuOTQsMy4wNzgtMS42NjYsNC44NjljMC4yNzQsMS43OTEsMS41MiwzLjMwNywzLjIyNiwzLjkzOGMxLjcwNiwwLjYzMSwzLjY0LDAuMzI3LDUuMDIyLTAuNzg4QzIyLjAyLDE0Ljc5MywyMi42MTIsMTIuNjMsMjIuMjIsMTAuODQ1eiIvPjxwYXRoIGZpbGw9IiMzNEE4NTMiIGQ9Ik0xNy4wNDQsMTguNTA5YzAuNTg5LTAuNDM3LDEuMTQ3LTAuOTIxLDEuNjYzLTEuNDQ4YzAuNTE2LTAuNTI3LDAuOTg5LTEuMTAxLDEuNDE1LTEuNzA5Yy0xLjM4MiwxLjExNC0zLjMxNiwxLjQxOS01LjAyMiwwLjc4OGMtMS43MDYtMC42MzEtMi45NTItMi4xNDctMy4yMjYtMy45MzhjLTAuMjc0LTEuNzkxLDAuMzQ4LTMuNjczLDEuNjY2LTQuODY5YzEuMzE4LTEuMTk1LDMuMjE1LTEuNjE4LDQuOTIyLTEuMDg4YzEuNzA3LDAuNTMsMi45NTIsMS45NDksMy4zNDQsMy43MzRjMC4zOTIsMS43ODUtMC4yLDMuOTQ4LTEuNzgxLDUuMjQ4Yy0wLjQyNiwwLjYwOC0wLjg5OSwxLjE4Mi0xLjQxNSwxLjcwOWMtMC41MTYsMC41MjctMS4wNzQsMS4wMTEtMS42NjMsMS40NDhjLTAuNTg5LDAuNDM3LTEuMjE2LDAuODI3LTEuODcxLDEuMTY1Yy0wLjY1NSwwLjMzOC0xLjM0LDAuNjI0LTIuMDQyLDAuODU1YzAuNzAyLTAuMjMxLDEuMzg3LTAuNTE3LDIuMDQyLTAuODU1QzE1LjgyOCwxOS4zMzYsMTYuNDU1LDE4Ljk0NiwxNy4wNDQsMTguNTA5eiIvPjxwYXRoIGZpbGw9IiNFQTQzMzUiIGQ9Ik0xMC4wMjUsMTMuMTljLTAuMjc0LTEuNzkxLTEuNTItMy4zMDctMy4yMjYtMy45MzhjLTEuNzA2LTAuNjMxLTMuNjQtMC4zMjctNS4wMjIsMC43ODhDMC4xOTUsMTEuMzQtMC4zOTcsMTMuNTAzLTAuMDA1LDE1LjI4OGMwLjM5MiwxLjc4NSwxLjYzNywzLjIwNCwzLjM0NCwzLjczNGMxLjcwNywwLjUzLDMuNjA0LDAuMTA3LDQuOTIyLTEuMDg4QzEwLjU3OSwxNi43MzgsMTEuMjAxLDE0Ljk4MSwxMC4wMjUsMTMuMTl6Ii8+PHBhdGggZmlsbD0iI0ZCQkMwNCIgZD0iTTMuMzM5LDE5LjAyMmMtMS43MDctMC41My0yLjk1Mi0xLjk0OS0zLjM0NC0zLjczNGMtMC4zOTItMS43ODUsMC4yLTMuOTQ4LDEuNzgxLTUuMjQ4YzEuMzgyLTEuMTE0LDMuMzE2LTEuNDE5LDUuMDIyLTAuNzg4YzEuNzA2LDAuNjMxLDIuOTUyLDIuMTQ3LDMuMjI2LDMuOTM4YzEuMTc2LDEuNzkxLDAuNTU0LDMuNTQ4LTEuMDI4LDQuODQ0QzYuOTQzLDE5LjEyOSw1LjA0NiwxOS41NTIsMy4zMzksMTkuMDIyeiIvPjwvc3ZnPg==" alt="Logo">
+                <h1>Telegram Bot Manager</h1>
+            </div>
+            <div>
+                <a href="https://t.me/AI4Arabs" target="_blank" class="btn">قناة ذكاء اصطناعي العرب</a>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="setup-panel">
+                <h2 class="panel-title">إعداد البوت الذكي</h2>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="basic">الإعدادات الأساسية</div>
+                    <div class="tab" data-tab="advanced">إعدادات متقدمة</div>
+                    <div class="tab" data-tab="templates">قوالب جاهزة</div>
+                </div>
+                
+                <div class="tab-content active" id="basic-tab">
+                    <div class="form-group">
+                        <label for="telegramToken">توكن بوت تليجرام (من BotFather):</label>
+                        <input type="text" id="telegramToken" placeholder="مثال: 1234567890:ABCDefGhIJKlmNoPQRsTUVwxyZ">
+                        <div class="help-text">
+                            <a href="https://t.me/BotFather" target="_blank">احصل على توكن من BotFather</a>
+                            <span class="tooltip">ℹ️
+                                <span class="tooltip-text">قم بإنشاء بوت جديد عبر BotFather على تليجرام، ثم انسخ التوكن الذي يعطيه لك</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="geminiToken">توكن Gemini API (من Google AI Studio):</label>
+                        <input type="text" id="geminiToken" placeholder="مثال: AIzaSyD...">
+                        <div class="help-text">
+                            <a href="https://aistudio.google.com/app/apikey" target="_blank">احصل على توكن من Google AI Studio</a>
+                            <span class="tooltip">ℹ️
+                                <span class="tooltip-text">قم بإنشاء مفتاح API من Google AI Studio للوصول إلى نماذج Gemini</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="systemInstruction">تعليمات النظام (System Instruction):</label>
+                        <textarea id="systemInstruction" placeholder="أنت مساعد ذكي يجيب على أسئلة المستخدمين بدقة ولطف..."></textarea>
+                        <div class="help-text">هذه التعليمات تحدد شخصية وسلوك البوت</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="connectionMethod">طريقة الاتصال:</label>
+                        <select id="connectionMethod">
+                            <option value="direct">مباشر (الافتراضي)</option>
+                            <option value="corsProxy">وكيل CORS</option>
+                            <option value="localProxy">وكيل محلي</option>
+                        </select>
+                        <div class="help-text">
+                            إذا واجهت مشاكل في الاتصال، جرب استخدام وكيل CORS أو وكيل محلي.
+                        </div>
+                    </div>
+                    
+                    <button id="startBot" class="btn btn-danger btn-block">تشغيل البوت</button>
+                </div>
+                
+                <div class="tab-content" id="advanced-tab">
+                    <div class="form-group">
+                        <label for="modelSelection">اختيار نموذج Gemini:</label>
+                        <select id="modelSelection">
+                            <option value="gemini-1.5-flash">Gemini 1.5 Flash (أسرع)</option>
+                            <option value="gemini-1.5-pro" selected>Gemini 1.5 Pro (أكثر ذكاءً)</option>
+                            <option value="gemini-1.0-pro">Gemini 1.0 Pro (استهلاك أقل)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="maxTokens">الحد الأقصى للرموز (Max Tokens):</label>
+                        <input type="number" id="maxTokens" value="2048" min="1" max="32768">
+                        <div class="help-text">عدد الرموز القصوى في الرد (1-32768)</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="temperature">درجة الإبداعية (Temperature):</label>
+                        <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.7">
+                        <div class="help-text">0 = أكثر دقة، 1 = أكثر إبداعاً</div>
+                    </div>
+                    
+                    <div class="memory-settings">
+                        <div class="form-group">
+                            <label for="memoryLimit">حد الذاكرة (عدد الرسائل):</label>
+                            <input type="number" id="memoryLimit" value="10" min="1" max="100">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="memoryType">نوع الذاكرة:</label>
+                            <select id="memoryType">
+                                <option value="conversation">محادثة كاملة</option>
+                                <option value="summary">ملخص ذكي</option>
+                                <option value="vector">ذاكرة متجهية</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>دعم الوسائط المتعددة:</label>
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <input type="checkbox" id="supportImages" checked>
+                                <label for="supportImages">دعم الصور</label>
+                                <span class="tooltip">ℹ️
+                                    <span class="tooltip-text">يمكن للبوت تحليل الصور التي يرسلها المستخدمون والرد عليها</span>
+                                </span>
+                            </div>
+                            <div class="feature-item">
+                                <input type="checkbox" id="supportVideo" checked>
+                                <label for="supportVideo">دعم الفيديو</label>
+                                <span class="tooltip">ℹ️
+                                    <span class="tooltip-text">يمكن للبوت تحليل مقاطع الفيديو التي يرسلها المستخدمون والرد عليها</span>
+                                </span>
+                            </div>
+                            <div class="feature-item">
+                                <input type="checkbox" id="supportAudio" checked>
+                                <label for="supportAudio">دعم التسجيلات الصوتية</label>
+                                <span class="tooltip">ℹ️
+                                    <span class="tooltip-text">يمكن للبوت تحويل التسجيلات الصوتية إلى نص والرد عليها</span>
+                                </span>
+                            </div>
+                            <div class="feature-item">
+                                <input type="checkbox" id="supportDocuments" checked>
+                                <label for="supportDocuments">دعم المستندات</label>
+                                <span class="tooltip">ℹ️
+                                    <span class="tooltip-text">يمكن للبوت تحليل المستندات النصية التي يرسلها المستخدمون والرد عليها</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="webhookMode">وضع الويبهوك:</label>
+                        <select id="webhookMode" onchange="toggleWebhookSettings()">
+                            <option value="dynamic">ديناميكي (تلقائي)</option>
+                            <option value="custom">مخصص (متقدم)</option>
+                            <option value="longPolling">Long Polling (بديل)</option>
+                        </select>
+                        <div class="help-text">
+                            <strong>ديناميكي:</strong> يستخدم عنوان URL الحالي كقاعدة للويبهوك.
+                            <br>
+                            <strong>مخصص:</strong> يسمح لك بتحديد عنوان URL مخصص للويبهوك.
+                            <br>
+                            <strong>Long Polling:</strong> لا يتطلب ويبهوك، مناسب للاختبار المحلي.
+                        </div>
+                    </div>
+                    
+                    <div id="customWebhookSettings" style="display: none;">
+                        <div class="form-group">
+                            <label for="customWebhookUrl">عنوان URL المخصص للويبهوك:</label>
+                            <input type="text" id="customWebhookUrl" placeholder="https://example.com/webhook">
+                            <div class="help-text">يجب أن يبدأ بـ https:// ويكون متاحاً من الإنترنت.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="webhook-guide">
+                        <h4>دليل إعداد الويبهوك على الاستضافة</h4>
+                        <ol>
+                            <li><strong>تأكد من دعم HTTPS:</strong> يتطلب تليجرام اتصالاً آمناً للويبهوك.</li>
+                            <li><strong>إنشاء ملف خادم:</strong> قم بإنشاء ملف <code>server.js</code> على استضافتك باستخدام الكود المقدم.</li>
+                            <li><strong>تثبيت الحزم المطلوبة:</strong> قم بتثبيت <code>express</code>، <code>body-parser</code>، و <code>axios</code> باستخدام npm.</li>
+                            <li><strong>تشغيل الخادم:</strong> استخدم <code>node server.js</code> لتشغيل الخادم.</li>
+                            <li><strong>التأكد من الوصول:</strong> تأكد من أن عنوان URL للويبهوك متاح من الإنترنت.</li>
+                        </ol>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button class="test-connection-btn" onclick="testWebhookConnection()">اختبار اتصال الويبهوك</button>
+                            <button class="test-connection-btn" onclick="downloadServerCode()">تنزيل كود الخادم</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="help-text" style="background-color: #fff3cd; padding: 10px; border-radius: var(--border-radius);">
+                            <strong>ملاحظة هامة:</strong> لكي يعمل البوت بشكل صحيح على التليجرام، يجب تنفيذ كود الخادم على استضافة تدعم Node.js وتكون متاحة من الإنترنت. استضافات مثل Heroku أو Vercel أو Glitch مناسبة لهذا الغرض.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="templates-tab">
+                    <div class="form-group">
+                        <label>اختر قالباً جاهزاً:</label>
+                        <div class="feature-list">
+                            <div class="feature-item" data-template="assistant">
+                                <div class="feature-icon">👨‍💼</div>
+                                <div>مساعد شخصي</div>
+                            </div>
+                            <div class="feature-item" data-template="teacher">
+                                <div class="feature-icon">👨‍🏫</div>
+                                <div>معلم ومدرب</div>
+                            </div>
+                            <div class="feature-item" data-template="writer">
+                                <div class="feature-icon">✍️</div>
+                                <div>كاتب محتوى</div>
+                            </div>
+                            <div class="feature-item" data-template="coder">
+                                <div class="feature-icon">👨‍💻</div>
+                                <div>مبرمج ومطور</div>
+                            </div>
+                            <div class="feature-item" data-template="translator">
+                                <div class="feature-icon">🌐</div>
+                                <div>مترجم متعدد اللغات</div>
+                            </div>
+                            <div class="feature-item" data-template="analyzer">
+                                <div class="feature-icon">📊</div>
+                                <div>محلل بيانات</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="status-panel">
+                <h2 class="panel-title">حالة البوت</h2>
+                
+                <div class="bot-status">
+                    <div class="status-indicator" id="statusIndicator"></div>
+                    <div id="statusText">غير متصل</div>
+                </div>
+                
+                <div class="webhook-status" id="webhookStatus">
+                    <div>حالة Webhook: <span id="webhookStatusText">غير متصل</span></div>
+                    <div class="webhook-url" id="webhookUrl"></div>
+                </div>
+                
+                <div class="logs-container" id="logsContainer">
+                    <div class="log-entry log-info">جاهز لإعداد البوت...</div>
+                </div>
+                
+                <h3 style="margin-top: 20px;">البوتات النشطة</h3>
+                <div class="bot-list" id="botList">
+                    <!-- سيتم إضافة البوتات هنا ديناميكياً -->
+                </div>
+                
+                <div class="stats-panel">
+                    <h3>إحصائيات الاستخدام</h3>
+                    <div class="stats-item">
+                        <div>البوتات النشطة:</div>
+                        <div class="stats-value" id="statsActiveBots">0</div>
+                    </div>
+                    <div class="stats-item">
+                        <div>إجمالي المستخدمين:</div>
+                        <div class="stats-value" id="statsTotalUsers">0</div>
+                    </div>
+                    <div class="stats-item">
+                        <div>إجمالي الرسائل:</div>
+                        <div class="stats-value" id="statsTotalMessages">0</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; text-align: center;">
+                    <button class="btn btn-import" onclick="importBotConfig()">استيراد إعدادات</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="loading" id="loadingIndicator">
+            <div class="spinner"></div>
+            <div id="loadingText">جاري تشغيل البوت...</div>
+        </div>
+        
+        <div class="modal" id="botDetailsModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>تفاصيل البوت</h2>
+                    <span class="modal-close">&times;</span>
+                </div>
+                <div id="botDetailsContent"></div>
+            </div>
+        </div>
+        
+        <footer class="footer">
+            <p>تم التطوير بواسطة <a href="https://t.me/AI4Arabs" target="_blank">قناة ذكاء اصطناعي العرب</a> &copy; 2024</p>
+        </footer>
+    </div>
+
+    <script>
+        // ================ المتغيرات العامة ================
+        const botStorage = {}; // تخزين بيانات البوتات
+        const userMemory = {}; // ذاكرة المستخدمين
+        const ipMap = {}; // خريطة عناوين IP للمستخدمين
+        let currentWebhookUrl = ''; // رابط الويب هوك الحالي
+        let isPollingActive = false; // حالة الاستطلاع
+        
+        // ================ وظائف واجهة المستخدم ================
+        // تبديل التبويبات
+        document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            t.classList.add('active');
+            document.getElementById(`${t.dataset.tab}-tab`).classList.add('active');
+            
+            // إظهار/إخفاء إعدادات Webhook المخصصة
+            if (t.dataset.tab === 'advanced') {
+                const webhookMode = document.getElementById('webhookMode').value;
+                document.getElementById('customWebhookSettings').style.display = 
+                    webhookMode === 'custom' ? 'block' : 'none';
+            }
+        }));
+        
+        // تغيير وضع Webhook
+        document.getElementById('webhookMode').addEventListener('change', function() {
+            document.getElementById('customWebhookSettings').style.display = 
+                this.value === 'custom' ? 'block' : 'none';
+        });
+        
+        // اختيار القوالب الجاهزة
+        document.querySelectorAll('.feature-item[data-template]').forEach(item => {
+            item.addEventListener('click', () => {
+                const templateType = item.dataset.template;
+                applyTemplate(templateType);
+                
+                // تحديد القالب المختار بصرياً
+                document.querySelectorAll('.feature-item[data-template]').forEach(i => {
+                    i.style.backgroundColor = '#f5f5f5';
+                });
+                item.style.backgroundColor = '#e0f2fe';
+            });
+        });
+        
+        // ================ وظائف القوالب ================
+        function applyTemplate(type) {
+            const templates = {
+                assistant: {
+                    instruction: `أنت مساعد شخصي ذكي ومفيد. مهمتك هي مساعدة المستخدم في المهام اليومية، الإجابة على الأسئلة، تقديم النصائح، وتنظيم المعلومات بطريقة مفيدة وودية. استخدم لغة بسيطة ومباشرة، وكن دائماً مهذباً ومتعاوناً. يمكنك التعامل مع الاستفسارات المتنوعة، من المعلومات العامة إلى النصائح الشخصية، مع الحفاظ على خصوصية المستخدم وتقديم إجابات دقيقة ومفيدة.`,
+                    model: 'gemini-1.5-flash',
+                    temperature: 0.7,
+                    maxTokens: 2048
+                },
+                teacher: {
+                    instruction: `أنت معلم ومدرب متخصص، مهمتك شرح المفاهيم التعليمية بطريقة واضحة وسهلة الفهم. قم بتبسيط المعلومات المعقدة، وتقديم أمثلة توضيحية، والإجابة على الأسئلة التعليمية بصبر وتفصيل. ساعد المتعلمين على فهم المواضيع الصعبة من خلال تقسيمها إلى خطوات بسيطة. كن مشجعاً ومحفزاً، واقترح موارد إضافية للتعلم عند الحاجة. تعامل مع جميع المستويات التعليمية بطريقة مناسبة لكل مستوى.`,
+                    model: 'gemini-1.5-pro',
+                    temperature: 0.5,
+                    maxTokens: 4096
+                },
+                writer: {
+                    instruction: `أنت كاتب محتوى محترف، متخصص في إنشاء محتوى جذاب وأصلي. مهمتك كتابة نصوص إبداعية، مقالات، منشورات مدونات، ومحتوى تسويقي بأسلوب سلس وجذاب. استخدم لغة غنية ومتنوعة، مع الحفاظ على الوضوح والدقة. قم بتنظيم الأفكار بشكل منطقي، واستخدم عناوين فرعية وفقرات قصيرة لتسهيل القراءة. اجعل المحتوى مناسباً للجمهور المستهدف، وتأكد من أنه خالٍ من الأخطاء اللغوية والنحوية.`,
+                    model: 'gemini-1.5-pro',
+                    temperature: 0.8,
+                    maxTokens: 8192
+                },
+                coder: {
+                    instruction: `أنت مبرمج ومطور محترف، متخصص في مساعدة المستخدمين في مجال البرمجة وتطوير البرمجيات. مهمتك تقديم حلول برمجية، شرح مفاهيم البرمجة، تصحيح الأخطاء، وتحسين الكود. استخدم أمثلة عملية وشروحات مفصلة، مع الالتزام بأفضل الممارسات في البرمجة. قم بتنظيم الإجابات بشكل منطقي، واستخدم تنسيق الكود المناسب لتسهيل القراءة والفهم. كن دقيقاً في التفاصيل التقنية، وقدم حلولاً فعالة وقابلة للتطبيق.`,
+                    model: 'gemini-1.5-pro',
+                    temperature: 0.3,
+                    maxTokens: 8192
+                },
+                translator: {
+                    instruction: `أنت مترجم محترف متعدد اللغات، متخصص في الترجمة الدقيقة بين مختلف اللغات. مهمتك ترجمة النصوص مع الحفاظ على المعنى الأصلي، السياق الثقافي، والأسلوب اللغوي. قم بترجمة المصطلحات المتخصصة بدقة، وتكييف التعبيرات الاصطلاحية بما يناسب اللغة المستهدفة. كن حساساً للفروق الدقيقة في المعنى، واستخدم المصطلحات المناسبة للمجال المحدد. يمكنك أيضاً تقديم شروحات للترجمات عند الضرورة، وتوضيح الاختلافات الثقافية المهمة.`,
+                    model: 'gemini-1.5-pro',
+                    temperature: 0.4,
+                    maxTokens: 4096
+                },
+                analyzer: {
+                    instruction: `أنت محلل بيانات متخصص، مهمتك تحليل وتفسير البيانات وتقديم رؤى قيمة. ساعد المستخدمين في فهم البيانات، استخراج الاتجاهات، وتحديد الأنماط المهمة. قدم تحليلات دقيقة ومدعومة بالأدلة، مع استخدام لغة واضحة ومفهومة. اشرح المفاهيم الإحصائية بطريقة مبسطة، واقترح طرقاً لتحسين جمع البيانات وتحليلها. كن موضوعياً في تقييماتك، وقدم توصيات عملية بناءً على البيانات المتاحة.`,
+                    model: 'gemini-1.5-pro',
+                    temperature: 0.2,
+                    maxTokens: 4096
+                }
+            };
+            
+            const template = templates[type];
+            if (template) {
+                document.getElementById('systemInstruction').value = template.instruction;
+                document.getElementById('modelSelection').value = template.model;
+                document.getElementById('temperature').value = template.temperature;
+                document.getElementById('maxTokens').value = template.maxTokens;
+                
+                // إضافة سجل
+                addLog(`تم تطبيق قالب "${type}" بنجاح`, 'success');
+            }
+        }
+        
+        // ================ وظائف السجلات ================
+        function addLog(message, type = 'info') {
+            const logsContainer = document.getElementById('logsContainer');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            
+            logsContainer.appendChild(logEntry);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+        
+        // ================ وظائف إدارة البوتات ================
+        document.getElementById('startBot').addEventListener('click', async () => {
+            const telegramToken = document.getElementById('telegramToken').value.trim();
+            const geminiToken = document.getElementById('geminiToken').value.trim();
+            const systemInstruction = document.getElementById('systemInstruction').value.trim();
+            
+            // التحقق من صحة المدخلات
+            if (!telegramToken || !geminiToken || !systemInstruction) {
+                addLog('يرجى ملء جميع الحقول المطلوبة', 'error');
+                return;
+            }
+            
+            // جمع الإعدادات المتقدمة
+            const advancedSettings = {
+                model: document.getElementById('modelSelection').value,
+                maxTokens: parseInt(document.getElementById('maxTokens').value),
+                temperature: parseFloat(document.getElementById('temperature').value),
+                memoryLimit: parseInt(document.getElementById('memoryLimit').value),
+                memoryType: document.getElementById('memoryType').value,
+                supportImages: document.getElementById('supportImages').checked,
+                supportVideo: document.getElementById('supportVideo').checked,
+                supportAudio: document.getElementById('supportAudio').checked,
+                supportDocuments: document.getElementById('supportDocuments').checked,
+                webhookMode: document.getElementById('webhookMode').value,
+                customWebhookUrl: document.getElementById('customWebhookUrl').value
+            };
+            
+            // إظهار مؤشر التحميل
+            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById('loadingText').textContent = 'جاري تشغيل البوت...';
+            
+            try {
+                // إنشاء البوت
+                const botInfo = await setupBot(telegramToken, geminiToken, systemInstruction, advancedSettings);
+                
+                // تحديث واجهة المستخدم
+                updateBotStatus(botInfo);
+                
+                // إخفاء مؤشر التحميل
+                document.getElementById('loadingIndicator').style.display = 'none';
+                
+                addLog(`تم تشغيل البوت "${botInfo.username}" بنجاح!`, 'success');
+            } catch (error) {
+                addLog(`فشل في تشغيل البوت: ${error.message}`, 'error');
+                document.getElementById('loadingIndicator').style.display = 'none';
+            }
+        });
+        
+        async function setupBot(telegramToken, geminiToken, systemInstruction, settings) {
+            if (!telegramToken || !geminiToken) {
+                addLog("يرجى إدخال رموز Telegram و Gemini API", "error");
+                return;
+            }
+
+            try {
+                addLog("جاري إعداد البوت...", "info");
+                
+                // استخدام نقطة نهاية API بدلاً من الاتصال المباشر
+                fetch('/api/setup-bot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        telegramToken,
+                        geminiToken,
+                        systemInstruction,
+                        settings: JSON.stringify(settings || getDefaultSettings())
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`فشل إعداد البوت: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.success) {
+                        throw new Error(data.error || 'فشل إعداد البوت لسبب غير معروف');
+                    }
+                    
+                    const botId = data.botId;
+                    const botInfo = data.botInfo;
+                    const webhookUrl = data.webhookUrl;
+                    
+                    addLog(`تم إعداد البوت بنجاح: ${botInfo.first_name} (@${botInfo.username})`, "success");
+                    addLog(`تم إعداد الويبهوك على: ${webhookUrl}`, "success");
+                    
+                    // إنشاء كائن البوت
+                    activeBots[botId] = {
+                        id: botId,
+                        telegramToken: telegramToken,
+                        geminiToken: geminiToken,
+                        systemInstruction: systemInstruction,
+                        settings: settings || getDefaultSettings(),
+                        userMemory: {},
+                        status: "active",
+                        startTime: Date.now(),
+                        messageCount: 0,
+                        webhookUrl: webhookUrl
+                    };
+                    
+                    // تحديث حالة البوت إلى "نشط"
+                    updateBotStatus(botId, "active");
+                    
+                    // إضافة البوت إلى قائمة العرض
+                    addBotToList(botId, botInfo);
+                    
+                    // تحديث الإحصائيات
+                    updateStats();
+                    
+                    // حفظ البوتات في التخزين المحلي
+                    saveBots();
+                })
+                .catch(error => {
+                    addLog(`فشل في تشغيل البوت: ${error.message}`, "error");
+                    
+                    // إضافة معلومات تشخيصية إضافية
+                    if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                        addLog("مشكلة في الاتصال بالخادم. تأكد من اتصالك بالإنترنت.", "error");
+                    }
+                });
+            } catch (error) {
+                addLog(`خطأ: ${error.message}`, "error");
+            }
+        }
+
+        async function setupWebhook(token, webhookUrl) {
+            try {
+                // التحقق من توفر HTTPS
+                if (!webhookUrl.startsWith('https://')) {
+                    addLog('خطأ: يجب أن يبدأ عنوان الويبهوك بـ https://', 'error');
+                    return false;
+                }
+
+                // اختبار إمكانية الوصول للخادم
+                try {
+                    const response = await fetch(webhookUrl, { method: 'HEAD' });
+                    if (!response.ok) {
+                        addLog(`خطأ: لا يمكن الوصول إلى عنوان الويبهوك (${response.status})`, 'error');
+                        return false;
+                    }
+                } catch (error) {
+                    addLog(`خطأ: لا يمكن الوصول إلى عنوان الويبهوك (${error.message})`, 'error');
+                    return false;
+                }
+
+                // إعداد الويبهوك
+                const apiUrl = `https://api.telegram.org/bot${token}/setWebhook?url=${encodeURIComponent(webhookUrl)}`;
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (data.ok) {
+                    addLog('تم إعداد الويبهوك بنجاح', 'success');
+                    return true;
+                } else {
+                    addLog(`فشل في إعداد الويبهوك: ${data.description}`, 'error');
+                    return false;
+                }
+            } catch (error) {
+                addLog(`خطأ في إعداد الويبهوك: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        function setupWebhookHandler(botId, webhookUrl) {
+            // هذه الوظيفة تحتاج إلى تنفيذ على الخادم
+            // في بيئة العميل (المتصفح)، يمكننا فقط محاكاة استلام الرسائل
+            
+            addLog("ملاحظة: لتشغيل الويبهوك بشكل صحيح، يجب تنفيذ كود الخادم على استضافتك", "info");
+            addLog("إليك كود Node.js الذي يجب إضافته إلى خادمك:", "info");
+            
+            const serverCode = `
+// كود Node.js لمعالجة الويبهوك
+const express = require('express');
+const bodyParser = require('body-parser');
+const axios = require('axios');
+const app = express();
+
+app.use(bodyParser.json());
+
+app.post('/webhook/${botId}', async (req, res) => {
+    try {
+        const update = req.body;
+        console.log('تم استلام تحديث من تليجرام:', JSON.stringify(update));
+        
+        // معالجة الرسالة
+        if (update.message) {
+            const message = update.message;
+            const chatId = message.chat.id;
+            
+            // إرسال رد مؤقت
+            await axios.post(\`https://api.telegram.org/bot${activeBots[botId].telegramToken}/sendMessage\`, {
+                chat_id: chatId,
+                text: 'جاري معالجة رسالتك...'
+            });
+            
+            // معالجة الرسالة باستخدام Gemini API
+            // أضف هنا كود الاتصال بـ Gemini API
+            
+            // إرسال الرد النهائي
+            await axios.post(\`https://api.telegram.org/bot${activeBots[botId].telegramToken}/sendMessage\`, {
+                chat_id: chatId,
+                text: 'هذا رد من البوت الخاص بك!'
+            });
+        }
+        
+        res.sendStatus(200);
+    } catch (error) {
+        console.error('خطأ في معالجة التحديث:', error);
+        res.sendStatus(500);
+    }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(\`الخادم يعمل على المنفذ \${PORT}\`);
+});
+`;
+            
+            addLog(serverCode, "code");
+            addLog("قم بنسخ هذا الكود وتشغيله على خادمك لمعالجة الويبهوك بشكل صحيح", "info");
+            
+            // إضافة تعليمات للاستضافة
+            addLog("تعليمات الاستضافة:", "info");
+            addLog("1. تأكد من أن استضافتك تدعم Node.js", "info");
+            addLog("2. قم بتثبيت الحزم المطلوبة: express, body-parser, axios", "info");
+            addLog("3. قم بإنشاء ملف index.js وضع فيه الكود أعلاه", "info");
+            addLog("4. قم بتشغيل الخادم باستخدام الأمر: node index.js", "info");
+            addLog("5. تأكد من أن عنوان URL للويبهوك متاح من الإنترنت ويستخدم HTTPS", "info");
+        }
+
+        function setupLongPolling(botId) {
+            const bot = activeBots[botId];
+            if (!bot) {
+                addLog(`البوت غير موجود: ${botId}`, "error");
+                return;
+            }
+            
+            addLog("جاري إعداد وضع Long Polling...", "info");
+            
+            // إلغاء أي ويبهوك موجود
+            fetch(`https://api.telegram.org/bot${bot.telegramToken}/deleteWebhook`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ok) {
+                        addLog("تم إلغاء الويبهوك بنجاح", "success");
+                        startLongPolling(botId);
+                    } else {
+                        throw new Error(`فشل إلغاء الويبهوك: ${data.description}`);
+                    }
+                })
+                .catch(error => {
+                    addLog(`خطأ في إعداد Long Polling: ${error.message}`, "error");
+                });
+        }
+
+        function startLongPolling(botId) {
+            const bot = activeBots[botId];
+            if (!bot) {
+                addLog(`البوت غير موجود: ${botId}`, "error");
+                return;
+            }
+            
+            let offset = 0;
+            bot.pollingActive = true;
+            
+            addLog("بدء استطلاع التحديثات من تليجرام...", "info");
+            
+            function poll() {
+                if (!bot.pollingActive) {
+                    addLog("تم إيقاف استطلاع التحديثات", "info");
+                    return;
+                }
+                
+                fetch(`https://api.telegram.org/bot${bot.telegramToken}/getUpdates?offset=${offset}&timeout=30`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.ok && data.result.length > 0) {
+                            // تحديث offset لتجنب استلام نفس التحديثات مرة أخرى
+                            offset = data.result[data.result.length - 1].update_id + 1;
+                            
+                            // معالجة التحديثات
+                            data.result.forEach(update => {
+                                addLog(`تم استلام تحديث: ${JSON.stringify(update)}`, "info");
+                                
+                                if (update.message) {
+                                    // معالجة الرسالة
+                                    processMessage(botId, update.message);
+                                }
+                            });
+                        }
+                        
+                        // استمرار الاستطلاع
+                        setTimeout(() => poll(), 1000);
+                    })
+                    .catch(error => {
+                        addLog(`خطأ في استطلاع التحديثات: ${error.message}`, "error");
+                        // إعادة المحاولة بعد فترة
+                        setTimeout(() => poll(), 5000);
+                    });
+            }
+            
+            // بدء الاستطلاع
+            poll();
+        }
+
+        function verifyGeminiToken(token) {
+            return new Promise((resolve, reject) => {
+                if (!token || token.length < 10) {
+                    reject(new Error("توكن Gemini غير صالح"));
+                    return;
+                }
+                
+                // في بيئة حقيقية، يجب إجراء اختبار فعلي للتوكن
+                // هنا نقوم بمحاكاة التحقق لتجنب مشاكل CORS
+                setTimeout(() => {
+                    resolve();
+                }, 500);
+                
+                // محاولة إجراء طلب اختبار إلى Gemini API - معلق لتجنب مشاكل CORS
+                /*
+                fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${token}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: "Hello, this is a test."
+                            }]
+                        }]
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`فشل الاتصال بـ Gemini API: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(`توكن Gemini غير صالح: ${data.error.message}`);
+                    }
+                    resolve();
+                })
+                .catch(error => {
+                    reject(error);
+                });
+                */
+            });
+        }
+
+        function processMessage(botId, message) {
+            const bot = activeBots[botId];
+            if (!bot) {
+                addLog(`البوت غير موجود: ${botId}`, "error");
+                return;
+            }
+            
+            // تحديث عداد الرسائل
+            bot.messageCount++;
+            
+            // تحديث ذاكرة المستخدم
+            if (!bot.userMemory[message.from.id]) {
+                bot.userMemory[message.from.id] = {
+                    messages: [],
+                    lastActivity: Date.now()
+                };
+            }
+            
+            const userMemory = bot.userMemory[message.from.id];
+            userMemory.lastActivity = Date.now();
+            
+            // إضافة الرسالة إلى ذاكرة المستخدم
+            let messageContent = "";
+            let messageType = "text";
+            
+            if (message.text) {
+                messageContent = message.text;
+                messageType = "text";
+            } else if (message.photo) {
+                messageContent = "[صورة]";
+                messageType = "photo";
+            } else if (message.voice) {
+                messageContent = "[تسجيل صوتي]";
+                messageType = "voice";
+            } else if (message.video) {
+                messageContent = "[فيديو]";
+                messageType = "video";
+            } else if (message.document) {
+                messageContent = `[مستند: ${message.document.file_name || "بدون اسم"}]`;
+                messageType = "document";
+            } else {
+                messageContent = "[نوع رسالة غير مدعوم]";
+                messageType = "unsupported";
+            }
+            
+            userMemory.messages.push({
+                role: "user",
+                content: messageContent,
+                type: messageType,
+                timestamp: Date.now()
+            });
+            
+            // التحقق من حد الذاكرة
+            if (userMemory.messages.length > bot.settings.memoryLimit) {
+                // الاحتفاظ فقط بالرسائل الأخيرة
+                userMemory.messages = userMemory.messages.slice(-bot.settings.memoryLimit);
+            }
+            
+            addLog(`تم استلام رسالة من المستخدم ${message.from.id}: ${messageContent}`, "info");
+            
+            // معالجة الرسالة باستخدام Gemini API
+            generateResponse(botId, message.from.id, message.chat.id, messageContent, messageType);
+        }
+
+        function generateResponse(botId, userId, chatId, messageContent, messageType) {
+            const bot = activeBots[botId];
+            if (!bot) {
+                addLog(`البوت غير موجود: ${botId}`, "error");
+                return;
+            }
+            
+            const userMemory = bot.userMemory[userId];
+            
+            // إعداد سياق المحادثة لـ Gemini API
+            const conversationContext = userMemory.messages.map(msg => ({
+                role: msg.role === "user" ? "user" : "model",
+                parts: [{ text: msg.content }]
+            }));
+            
+            // إضافة تعليمات النظام في بداية المحادثة
+            conversationContext.unshift({
+                role: "model",
+                parts: [{ text: bot.systemInstruction }]
+            });
+            
+            addLog(`جاري إرسال الطلب إلى Gemini API...`, "info");
+            
+            // إرسال طلب إلى Gemini API
+            fetch(`https://generativelanguage.googleapis.com/v1beta/models/${bot.settings.model}:generateContent?key=${bot.geminiToken}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contents: conversationContext,
+                    generationConfig: {
+                        temperature: bot.settings.temperature,
+                        maxOutputTokens: bot.settings.maxTokens,
+                        topP: 0.9,
+                        topK: 40
+                    }
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`فشل الاتصال بـ Gemini API: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    throw new Error(`خطأ في Gemini API: ${data.error.message}`);
+                }
+                
+                // استخراج الرد من Gemini
+                const responseText = data.candidates[0].content.parts[0].text;
+                
+                // إضافة الرد إلى ذاكرة المستخدم
+                userMemory.messages.push({
+                    role: "assistant",
+                    content: responseText,
+                    type: "text",
+                    timestamp: Date.now()
+                });
+                
+                addLog(`تم إنشاء رد لـ ${userId}: ${responseText.substring(0, 50)}...`, "success");
+                
+                // إرسال الرد إلى المستخدم عبر Telegram API
+                sendTelegramMessage(botId, chatId, responseText);
+            })
+            .catch(error => {
+                addLog(`خطأ في إنشاء الرد: ${error.message}`, "error");
+                
+                // إرسال رسالة خطأ إلى المستخدم
+                sendTelegramMessage(botId, chatId, "عذراً، حدث خطأ أثناء معالجة رسالتك. يرجى المحاولة مرة أخرى لاحقاً.");
+            });
+        }
+
+        function sendTelegramMessage(botId, chatId, text) {
+            const bot = activeBots[botId];
+            if (!bot) {
+                addLog(`البوت غير موجود: ${botId}`, "error");
+                return;
+            }
+            
+            addLog(`جاري إرسال رد إلى المستخدم ${chatId}...`, "info");
+            
+            fetch(`https://api.telegram.org/bot${bot.telegramToken}/sendMessage`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: text,
+                    parse_mode: "Markdown"
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.ok) {
+                    addLog(`تم إرسال الرد بنجاح`, "success");
+                } else {
+                    throw new Error(`فشل إرسال الرد: ${data.description}`);
+                }
+            })
+            .catch(error => {
+                addLog(`خطأ في إرسال الرد: ${error.message}`, "error");
+            });
+        }
+        
+        // ================ وظائف مساعدة ================
+        async function getUserIp() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch (error) {
+                console.error('فشل في الحصول على عنوان IP:', error);
+                return 'unknown';
+            }
+        }
+        
+        // ================ وظائف عامة ================
+        // عرض تفاصيل البوت
+        window.showBotDetails = function(botId) {
+            const bot = botStorage[botId];
+            if (!bot) return;
+            
+            const modal = document.getElementById('botDetailsModal');
+            const content = document.getElementById('botDetailsContent');
+            
+            // حساب عدد المستخدمين الفريدين
+            const uniqueUsers = userMemory[botId] ? Object.keys(userMemory[botId]).length : 0;
+            
+            // حساب إجمالي الرسائل
+            let totalMessages = 0;
+            if (userMemory[botId]) {
+                Object.values(userMemory[botId]).forEach(memory => {
+                    totalMessages += memory.messages.length;
+                });
+            }
+            
+            content.innerHTML = `
+                <div class="bot-details">
+                    <p><strong>اسم المستخدم:</strong> @${bot.info.username}</p>
+                    <p><strong>الاسم:</strong> ${bot.info.first_name}</p>
+                    <p><strong>معرف البوت:</strong> ${bot.info.id}</p>
+                    <p><strong>نموذج Gemini:</strong> ${bot.settings.model}</p>
+                    <p><strong>وضع الاتصال:</strong> ${bot.settings.webhookMode === 'polling' ? 'Long Polling' : 'Webhook'}</p>
+                    <p><strong>تاريخ الإنشاء:</strong> ${new Date(bot.createdAt).toLocaleString()}</p>
+                    <p><strong>عنوان IP:</strong> ${bot.userIp}</p>
+                    <p><strong>عدد المستخدمين:</strong> ${uniqueUsers}</p>
+                    <p><strong>إجمالي الرسائل:</strong> ${totalMessages}</p>
+                    
+                    <h3 style="margin-top: 20px;">إعدادات البوت</h3>
+                    <p><strong>درجة الإبداعية:</strong> ${bot.settings.temperature}</p>
+                    <p><strong>الحد الأقصى للرموز:</strong> ${bot.settings.maxTokens}</p>
+                    <p><strong>حد الذاكرة:</strong> ${bot.settings.memoryLimit} رسائل</p>
+                    <p><strong>نوع الذاكرة:</strong> ${bot.settings.memoryType}</p>
+                    
+                    <h3 style="margin-top: 20px;">دعم الوسائط</h3>
+                    <p><strong>الصور:</strong> ${bot.settings.supportImages ? '✅' : '❌'}</p>
+                    <p><strong>الفيديو:</strong> ${bot.settings.supportVideo ? '✅' : '❌'}</p>
+                    <p><strong>التسجيلات الصوتية:</strong> ${bot.settings.supportAudio ? '✅' : '❌'}</p>
+                    <p><strong>المستندات:</strong> ${bot.settings.supportDocuments ? '✅' : '❌'}</p>
+                    
+                    <h3 style="margin-top: 20px;">تعليمات النظام</h3>
+                    <div style="background-color: #f5f5f5; padding: 15px; border-radius: 8px; margin-top: 10px;">
+                        ${bot.systemInstruction.replace(/\n/g, '<br>')}
+                    </div>
+                </div>
+            `;
+            
+            modal.style.display = 'flex';
+        };
+        
+        // إيقاف البوت
+        window.stopBot = function(botId) {
+            const bot = botStorage[botId];
+            if (!bot) return;
+            
+            showConfirmation(`هل أنت متأكد من رغبتك في إيقاف البوت "${bot.info.username}"؟`, () => {
+                bot.isActive = false;
+                document.getElementById(`bot-item-${botId}`).classList.add('bot-inactive');
+                
+                // إذا كان البوت هو البوت النشط حالياً، قم بتحديث حالة الواجهة
+                const currentStatusText = document.getElementById('statusText').textContent;
+                if (currentStatusText.includes(bot.info.username)) {
+                    document.getElementById('statusIndicator').classList.remove('status-active');
+                    document.getElementById('statusText').textContent = 'غير متصل';
+                    document.getElementById('webhookStatusText').textContent = 'غير متصل';
+                    document.getElementById('webhookUrl').textContent = '';
+                }
+                
+                addLog(`تم إيقاف البوت "${bot.info.username}"`, 'success');
+                updateUsageStats();
+            });
+        };
+        
+        // إغلاق النافذة المنبثقة
+        document.querySelector('.modal-close').addEventListener('click', () => {
+            document.getElementById('botDetailsModal').style.display = 'none';
+        });
+        
+        // إغلاق النافذة المنبثقة عند النقر خارجها
+        window.addEventListener('click', (event) => {
+            const modal = document.getElementById('botDetailsModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+        
+        // ================ وظائف التصدير والاستيراد ================
+        window.exportBotConfig = function(botId) {
+            const bot = botStorage[botId];
+            if (!bot) return;
+            
+            // إنشاء كائن التصدير (مع إزالة المعلومات الحساسة)
+            const exportData = {
+                name: bot.info.username,
+                systemInstruction: bot.systemInstruction,
+                settings: {
+                    model: bot.settings.model,
+                    maxTokens: bot.settings.maxTokens,
+                    temperature: bot.settings.temperature,
+                    memoryLimit: bot.settings.memoryLimit,
+                    memoryType: bot.settings.memoryType,
+                    supportImages: bot.settings.supportImages,
+                    supportVideo: bot.settings.supportVideo,
+                    supportAudio: bot.settings.supportAudio,
+                    supportDocuments: bot.settings.supportDocuments,
+                    webhookMode: bot.settings.webhookMode
+                },
+                exportDate: new Date().toISOString()
+            };
+            
+            // تحويل البيانات إلى سلسلة JSON
+            const jsonString = JSON.stringify(exportData, null, 2);
+            
+            // إنشاء رابط تنزيل
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(jsonString);
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", `${bot.info.username}_config.json`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            
+            addLog(`تم تصدير إعدادات البوت "${bot.info.username}"`, 'success');
+            showSuccessMessage(`تم تصدير إعدادات البوت "${bot.info.username}" بنجاح`);
+        };
+        
+        window.importBotConfig = function() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const config = JSON.parse(e.target.result);
+                        
+                        // التحقق من صحة الملف
+                        if (!config.systemInstruction || !config.settings) {
+                            throw new Error('ملف التكوين غير صالح');
+                        }
+                        
+                        // تطبيق الإعدادات
+                        document.getElementById('systemInstruction').value = config.systemInstruction;
+                        
+                        if (config.settings.model) {
+                            document.getElementById('modelSelection').value = config.settings.model;
+                        }
+                        
+                        if (config.settings.maxTokens) {
+                            document.getElementById('maxTokens').value = config.settings.maxTokens;
+                        }
+                        
+                        if (config.settings.temperature) {
+                            document.getElementById('temperature').value = config.settings.temperature;
+                        }
+                        
+                        if (config.settings.memoryLimit) {
+                            document.getElementById('memoryLimit').value = config.settings.memoryLimit;
+                        }
+                        
+                        if (config.settings.memoryType) {
+                            document.getElementById('memoryType').value = config.settings.memoryType;
+                        }
+                        
+                        if (config.settings.supportImages !== undefined) {
+                            document.getElementById('supportImages').checked = config.settings.supportImages;
+                        }
+                        
+                        if (config.settings.supportVideo !== undefined) {
+                            document.getElementById('supportVideo').checked = config.settings.supportVideo;
+                        }
+                        
+                        if (config.settings.supportAudio !== undefined) {
+                            document.getElementById('supportAudio').checked = config.settings.supportAudio;
+                        }
+                        
+                        if (config.settings.supportDocuments !== undefined) {
+                            document.getElementById('supportDocuments').checked = config.settings.supportDocuments;
+                        }
+                        
+                        if (config.settings.webhookMode) {
+                            document.getElementById('webhookMode').value = config.settings.webhookMode;
+                            document.getElementById('customWebhookSettings').style.display = 
+                                config.settings.webhookMode === 'custom' ? 'block' : 'none';
+                        }
+                        
+                        addLog(`تم استيراد الإعدادات من "${config.name || 'ملف غير معروف'}"`, 'success');
+                        showSuccessMessage(`تم استيراد الإعدادات بنجاح`);
+                        
+                        // التبديل إلى تبويب الإعدادات الأساسية
+                        document.querySelector('.tab[data-tab="basic"]').click();
+                        
+                    } catch (error) {
+                        addLog(`فشل في استيراد الإعدادات: ${error.message}`, 'error');
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        };
+        
+        // ================ وظائف تنظيف الذاكرة ================
+        // تنظيف ذاكرة المستخدمين غير النشطين دورياً
+        setInterval(() => {
+            const now = Date.now();
+            const inactiveThreshold = 24 * 60 * 60 * 1000; // 24 ساعة
+            
+            Object.keys(userMemory).forEach(botId => {
+                if (!userMemory[botId]) return;
+                
+                Object.keys(userMemory[botId]).forEach(userId => {
+                    const memory = userMemory[botId][userId];
+                    if (now - memory.lastInteraction > inactiveThreshold) {
+                        // حذف ذاكرة المستخدم غير النشط
+                        delete userMemory[botId][userId];
+                        console.log(`تم تنظيف ذاكرة المستخدم ${userId} للبوت ${botId}`);
+                    }
+                });
+            });
+        }, 60 * 60 * 1000); // كل ساعة
+        
+        // ================ وظائف إحصائيات الاستخدام ================
+        function updateUsageStats() {
+            // حساب إجمالي البوتات النشطة
+            const activeBots = Object.values(botStorage).filter(bot => bot.isActive).length;
+            
+            // حساب إجمالي المستخدمين
+            let totalUsers = 0;
+            Object.keys(userMemory).forEach(botId => {
+                if (userMemory[botId]) {
+                    totalUsers += Object.keys(userMemory[botId]).length;
+                }
+            });
+            
+            // حساب إجمالي الرسائل
+            let totalMessages = 0;
+            Object.keys(userMemory).forEach(botId => {
+                if (!userMemory[botId]) return;
+                
+                Object.values(userMemory[botId]).forEach(memory => {
+                    totalMessages += memory.messages.length;
+                });
+            });
+            
+            // تحديث الإحصائيات في واجهة المستخدم
+            document.getElementById('statsActiveBots').textContent = activeBots;
+            document.getElementById('statsTotalUsers').textContent = totalUsers;
+            document.getElementById('statsTotalMessages').textContent = totalMessages;
+        }
+        
+        // ================ وظائف التعامل مع الأخطاء ================
+        window.addEventListener('error', (event) => {
+            addLog(`خطأ في JavaScript: ${event.message}`, 'error');
+            console.error('خطأ غير معالج:', event.error);
+        });
+        
+        // ================ تهيئة التطبيق ================
+        // إضافة سجل بدء التشغيل
+        addLog('تم تحميل التطبيق بنجاح. جاهز لإعداد البوتات.', 'info');
+        
+        // تطبيق قالب افتراضي
+        applyTemplate('assistant');
+        
+        // إضافة زر تحديث البوت
+        window.updateBot = function(botId) {
+            const bot = botStorage[botId];
+            if (!bot) return;
+            
+            // فتح نافذة تحديث البوت
+            const modal = document.getElementById('botDetailsModal');
+            const content = document.getElementById('botDetailsContent');
+            
+            content.innerHTML = `
+                <div class="bot-update-form">
+                    <h3>تحديث إعدادات البوت</h3>
+                    
+                    <div class="form-group">
+                        <label for="updateSystemInstruction">تعليمات النظام:</label>
+                        <textarea id="updateSystemInstruction">${bot.systemInstruction}</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="updateModel">نموذج Gemini:</label>
+                        <select id="updateModel">
+                            <option value="gemini-1.5-flash" ${bot.settings.model === 'gemini-1.5-flash' ? 'selected' : ''}>Gemini 1.5 Flash (أسرع)</option>
+                            <option value="gemini-1.5-pro" ${bot.settings.model === 'gemini-1.5-pro' ? 'selected' : ''}>Gemini 1.5 Pro (أكثر ذكاءً)</option>
+                            <option value="gemini-1.0-pro" ${bot.settings.model === 'gemini-1.0-pro' ? 'selected' : ''}>Gemini 1.0 Pro (استهلاك أقل)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="updateMaxTokens">الحد الأقصى للرموز:</label>
+                        <input type="number" id="updateMaxTokens" value="${bot.settings.maxTokens}" min="1" max="32768">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="updateTemperature">درجة الإبداعية:</label>
+                        <input type="range" id="updateTemperature" min="0" max="1" step="0.1" value="${bot.settings.temperature}">
+                        <div class="help-text">القيمة الحالية: <span id="temperatureValue">${bot.settings.temperature}</span></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="updateMemoryLimit">حد الذاكرة (عدد الرسائل):</label>
+                        <input type="number" id="updateMemoryLimit" value="${bot.settings.memoryLimit}" min="1" max="100">
+                    </div>
+                    
+                    <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn btn-secondary" onclick="document.getElementById('botDetailsModal').style.display = 'none'">إلغاء</button>
+                        <button class="btn btn-success" onclick="saveUpdatedBot('${botId}')">حفظ التغييرات</button>
+                    </div>
+                </div>
+            `;
+            
+            // إضافة مستمع حدث لتحديث قيمة درجة الإبداعية
+            setTimeout(() => {
+                const temperatureSlider = document.getElementById('updateTemperature');
+                const temperatureValue = document.getElementById('temperatureValue');
+                
+                if (temperatureSlider && temperatureValue) {
+                    temperatureSlider.addEventListener('input', function() {
+                        temperatureValue.textContent = this.value;
+                    });
+                }
+            }, 100);
+            
+            modal.style.display = 'flex';
+        };
+        
+        // حفظ تحديثات البوت
+        window.saveUpdatedBot = function(botId) {
+            const bot = botStorage[botId];
+            if (!bot) return;
+            
+            // الحصول على القيم المحدثة
+            const systemInstruction = document.getElementById('updateSystemInstruction').value.trim();
+            const model = document.getElementById('updateModel').value;
+            const maxTokens = parseInt(document.getElementById('updateMaxTokens').value);
+            const temperature = parseFloat(document.getElementById('updateTemperature').value);
+            const memoryLimit = parseInt(document.getElementById('updateMemoryLimit').value);
+            
+            // التحقق من صحة المدخلات
+            if (!systemInstruction) {
+                addLog('يرجى ملء حقل تعليمات النظام', 'error');
+                return;
+            }
+            
+            // تحديث إعدادات البوت
+            bot.systemInstruction = systemInstruction;
+            bot.settings.model = model;
+            bot.settings.maxTokens = maxTokens;
+            bot.settings.temperature = temperature;
+            bot.settings.memoryLimit = memoryLimit;
+            
+            // إغلاق النافذة المنبثقة
+            document.getElementById('botDetailsModal').style.display = 'none';
+            
+            // إضافة سجل
+            addLog(`تم تحديث إعدادات البوت "${bot.info.username}" بنجاح`, 'success');
+        };
+        
+        // إضافة وظيفة لإظهار رسائل تأكيد
+        function showConfirmation(message, callback) {
+            const confirmationModal = document.createElement('div');
+            confirmationModal.className = 'modal';
+            confirmationModal.style.display = 'flex';
+            
+            confirmationModal.innerHTML = `
+                <div class="modal-content" style="max-width: 400px;">
+                    <div class="modal-header">
+                        <h2>تأكيد</h2>
+                        <span class="modal-close">&times;</span>
+                    </div>
+                    <div style="margin: 20px 0;">
+                        <p>${message}</p>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                        <button class="btn btn-secondary" id="cancelBtn">إلغاء</button>
+                        <button class="btn btn-danger" id="confirmBtn">تأكيد</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(confirmationModal);
+            
+            // إضافة مستمعي الأحداث
+            document.getElementById('cancelBtn').addEventListener('click', () => {
+                document.body.removeChild(confirmationModal);
+            });
+            
+            document.getElementById('confirmBtn').addEventListener('click', () => {
+                document.body.removeChild(confirmationModal);
+                if (typeof callback === 'function') {
+                    callback();
+                }
+            });
+            
+            confirmationModal.querySelector('.modal-close').addEventListener('click', () => {
+                document.body.removeChild(confirmationModal);
+            });
+            
+            confirmationModal.addEventListener('click', (event) => {
+                if (event.target === confirmationModal) {
+                    document.body.removeChild(confirmationModal);
+                }
+            });
+        }
+        
+        // إضافة وظيفة لإظهار رسائل نجاح
+        function showSuccessMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.className = 'success-message';
+            messageElement.textContent = message;
+            messageElement.style.position = 'fixed';
+            messageElement.style.top = '20px';
+            messageElement.style.right = '20px';
+            messageElement.style.backgroundColor = 'var(--secondary-color)';
+            messageElement.style.color = 'white';
+            messageElement.style.padding = '15px 20px';
+            messageElement.style.borderRadius = 'var(--border-radius)';
+            messageElement.style.boxShadow = 'var(--box-shadow)';
+            messageElement.style.zIndex = '2000';
+            messageElement.style.opacity = '0';
+            messageElement.style.transition = 'opacity 0.3s ease';
+            
+            document.body.appendChild(messageElement);
+            
+            // إظهار الرسالة
+            setTimeout(() => {
+                messageElement.style.opacity = '1';
+            }, 10);
+            
+            // إخفاء الرسالة بعد 3 ثوانٍ
+            setTimeout(() => {
+                messageElement.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(messageElement);
+                }, 300);
+            }, 3000);
+        }
+
+        function testWebhookConnection() {
+            const telegramToken = document.getElementById('telegramToken').value;
+            if (!telegramToken) {
+                addLog("يرجى إدخال توكن التليجرام أولاً", "error");
+                return;
+            }
+            
+            addLog("جاري اختبار اتصال الويبهوك...", "info");
+            
+            // التحقق من معلومات الويبهوك الحالية
+            fetch(`https://api.telegram.org/bot${telegramToken}/getWebhookInfo`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`فشل الاتصال بـ Telegram API: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.ok) {
+                        throw new Error(`خطأ في الحصول على معلومات الويبهوك: ${data.description}`);
+                    }
+                    
+                    const webhookInfo = data.result;
+                    
+                    if (!webhookInfo.url) {
+                        addLog("لم يتم إعداد الويبهوك بعد", "warning");
+                        return;
+                    }
+                    
+                    addLog(`معلومات الويبهوك الحالية:`, "info");
+                    addLog(`URL: ${webhookInfo.url}`, "info");
+                    addLog(`حالة الشهادة: ${webhookInfo.has_custom_certificate ? 'مخصصة' : 'قياسية'}`, "info");
+                    addLog(`عدد التحديثات المعلقة: ${webhookInfo.pending_update_count}`, "info");
+                    
+                    if (webhookInfo.last_error_date) {
+                        const errorDate = new Date(webhookInfo.last_error_date * 1000);
+                        addLog(`آخر خطأ: ${errorDate.toLocaleString()} - ${webhookInfo.last_error_message}`, "error");
+                        
+                        // تحليل رسالة الخطأ وتقديم اقتراحات
+                        analyzeWebhookError(webhookInfo.last_error_message);
+                    } else {
+                        addLog("لم يتم تسجيل أي أخطاء في الويبهوك", "success");
+                    }
+                    
+                    // اختبار إرسال رسالة للتأكد من أن البوت يعمل
+                    return fetch(`https://api.telegram.org/bot${telegramToken}/getMe`);
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ok) {
+                        addLog(`البوت متصل: ${data.result.first_name} (@${data.result.username})`, "success");
+                        addLog("جاري إرسال رسالة اختبار...", "info");
+                        
+                        // إنشاء رسالة اختبار للمطور (يتطلب معرفة معرف المطور)
+                        const developerChatId = prompt("أدخل معرف الدردشة الخاص بك لإرسال رسالة اختبار:");
+                        if (developerChatId) {
+                            return fetch(`https://api.telegram.org/bot${telegramToken}/sendMessage`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    chat_id: developerChatId,
+                                    text: "هذه رسالة اختبار من واجهة إدارة البوت. إذا استلمت هذه الرسالة، فإن البوت يعمل بشكل صحيح!"
+                                })
+                            });
+                        }
+                    }
+                })
+                .then(response => {
+                    if (response) {
+                        return response.json();
+                    }
+                })
+                .then(data => {
+                    if (data && data.ok) {
+                        addLog("تم إرسال رسالة الاختبار بنجاح!", "success");
+                    } else if (data) {
+                        addLog(`فشل إرسال رسالة الاختبار: ${data.description}`, "error");
+                    }
+                })
+                .catch(error => {
+                    addLog(`خطأ في اختبار الاتصال: ${error.message}`, "error");
+                });
+        }
+
+        function analyzeWebhookError(errorMessage) {
+            if (errorMessage.includes("HTTPS url must be provided")) {
+                addLog("المشكلة: يجب استخدام HTTPS للويبهوك", "error");
+                addLog("الحل: تأكد من أن عنوان URL للويبهوك يبدأ بـ https://", "info");
+            } else if (errorMessage.includes("Not Found")) {
+                addLog("المشكلة: لم يتم العثور على عنوان URL للويبهوك", "error");
+                addLog("الحل: تأكد من أن الخادم يعمل وأن المسار صحيح", "info");
+            } else if (errorMessage.includes("Connection refused")) {
+                addLog("المشكلة: تم رفض الاتصال بالخادم", "error");
+                addLog("الحل: تأكد من أن الخادم يعمل وأن المنفذ مفتوح", "info");
+            } else if (errorMessage.includes("Connection timed out")) {
+                addLog("المشكلة: انتهت مهلة الاتصال", "error");
+                addLog("الحل: تحقق من اتصال الخادم بالإنترنت وأن المنفذ غير محظور", "info");
+            } else if (errorMessage.includes("SSL")) {
+                addLog("المشكلة: خطأ في شهادة SSL", "error");
+                addLog("الحل: تأكد من أن شهادة SSL صالحة وغير منتهية الصلاحية", "info");
+            } else {
+                addLog("نصائح عامة لحل مشاكل الويبهوك:", "info");
+                addLog("1. تأكد من أن الخادم متاح من الإنترنت", "info");
+                addLog("2. تأكد من أن المسار صحيح (/webhook/BOT_ID)", "info");
+                addLog("3. تأكد من أن الخادم يستجيب بكود حالة 200", "info");
+                addLog("4. تحقق من سجلات الخادم للحصول على مزيد من المعلومات", "info");
+            }
+        }
+
+        function generateServerCode(botId, telegramToken, geminiToken, systemInstruction) {
+            const serverCode = `
+// server.js - كود Node.js لمعالجة الويبهوك
+const express = require('express');
+const bodyParser = require('body-parser');
+const axios = require('axios');
+const app = express();
+
+app.use(bodyParser.json());
+
+app.post('/webhook/${botId}', async (req, res) => {
+    try {
+        const update = req.body;
+        console.log('تم استلام تحديث من تليجرام:', JSON.stringify(update));
+        
+        // معالجة الرسالة
+        if (update.message) {
+            const message = update.message;
+            const chatId = message.chat.id;
+            
+            // إرسال رد مؤقت
+            await axios.post(\`https://api.telegram.org/bot${activeBots[botId].telegramToken}/sendMessage\`, {
+                chat_id: chatId,
+                text: 'جاري معالجة رسالتك...'
+            });
+            
+            // معالجة الرسالة باستخدام Gemini API
+            // أضف هنا كود الاتصال بـ Gemini API
+            
+            // إرسال الرد النهائي
+            await axios.post(\`https://api.telegram.org/bot${activeBots[botId].telegramToken}/sendMessage\`, {
+                chat_id: chatId,
+                text: 'هذا رد من البوت الخاص بك!'
+            });
+        }
+        
+        res.sendStatus(200);
+    } catch (error) {
+        console.error('خطأ في معالجة التحديث:', error);
+        res.sendStatus(500);
+    }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(\`الخادم يعمل على المنفذ \${PORT}\`);
+});
+`;
+            
+            return serverCode;
+        }
+
+        function downloadServerCode() {
+            const telegramToken = document.getElementById('telegramToken').value;
+            const geminiToken = document.getElementById('geminiToken').value;
+            const systemInstruction = document.getElementById('systemInstruction').value;
+            
+            if (!telegramToken || !geminiToken || !systemInstruction) {
+                addLog("يرجى إدخال جميع المعلومات المطلوبة أولاً", "error");
+                return;
+            }
+            
+            const botId = Date.now().toString();
+            const serverCode = generateServerCode(botId, telegramToken, geminiToken, systemInstruction);
+            
+            // إنشاء ملف للتنزيل
+            const blob = new Blob([serverCode], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'server.js';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            addLog("تم تنزيل ملف server.js. قم بتحميله إلى استضافتك وتشغيله باستخدام Node.js", "success");
+        }
+
+        // إضافة دالة updateBotStatus المفقودة
+        function updateBotStatus(botId, status) {
+            // تحديث حالة البوت في الكائن
+            if (activeBots[botId]) {
+                activeBots[botId].status = status;
+            }
+            
+            // تحديث العرض المرئي للحالة
+            const statusElement = document.getElementById(`bot-status-${botId}`);
+            if (statusElement) {
+                // إزالة جميع فئات الحالة
+                statusElement.classList.remove("status-active", "status-error", "status-checking", "status-inactive");
+                
+                // إضافة فئة الحالة المناسبة
+                switch (status) {
+                    case "active":
+                        statusElement.classList.add("status-active");
+                        break;
+                    case "error":
+                        statusElement.classList.add("status-error");
+                        break;
+                    case "checking":
+                        statusElement.classList.add("status-checking");
+                        break;
+                    case "inactive":
+                        statusElement.classList.add("status-inactive");
+                        break;
+                }
+            }
+            
+            // تحديث نص الحالة
+            const statusTextElement = document.getElementById(`bot-status-text-${botId}`);
+            if (statusTextElement) {
+                switch (status) {
+                    case "active":
+                        statusTextElement.textContent = "نشط";
+                        break;
+                    case "error":
+                        statusTextElement.textContent = "خطأ";
+                        break;
+                    case "checking":
+                        statusTextElement.textContent = "جاري التحقق";
+                        break;
+                    case "inactive":
+                        statusTextElement.textContent = "غير نشط";
+                        break;
+                }
+            }
+        }
+        
+        // إضافة CSS للحالة الجديدة "checking"
+        document.head.insertAdjacentHTML('beforeend', `
+            <style>
+                .status-checking {
+                    background-color: #FFC107;
+                    animation: pulse 1.5s infinite;
+                }
+                
+                @keyframes pulse {
+                    0% { opacity: 0.6; }
+                    50% { opacity: 1; }
+                    100% { opacity: 0.6; }
+                }
+            </style>
+        `);
+        
+        // إضافة دالة للتعامل مع مشاكل CORS
+        function setupCorsProxy() {
+            const corsProxyUrl = "https://cors-anywhere.herokuapp.com/";
+            
+            addLog("جاري إعداد وكيل CORS لتجاوز قيود الاتصال...", "info");
+            
+            // تعديل جميع طلبات fetch لاستخدام وكيل CORS
+            const originalFetch = window.fetch;
+            window.fetch = function(url, options) {
+                // إذا كان الطلب إلى Telegram API، استخدم وكيل CORS
+                if (url.includes("api.telegram.org")) {
+                    const proxyUrl = corsProxyUrl + url;
+                    addLog(`استخدام وكيل CORS: ${proxyUrl}`, "info");
+                    return originalFetch(proxyUrl, options);
+                }
+                
+                // وإلا استخدم fetch العادي
+                return originalFetch(url, options);
+            };
+            
+            addLog("تم إعداد وكيل CORS بنجاح", "success");
+        }
+        
+        // إضافة زر لتفعيل وكيل CORS
+        function addCorsProxyButton() {
+            const setupPanel = document.querySelector('.setup-panel');
+            if (setupPanel) {
+                const corsButton = document.createElement('button');
+                corsButton.className = 'btn btn-secondary';
+                corsButton.style.marginTop = '10px';
+                corsButton.textContent = 'تفعيل وكيل CORS (لحل مشاكل الاتصال)';
+                corsButton.onclick = setupCorsProxy;
+                
+                setupPanel.appendChild(corsButton);
+            }
+        }
+        
+        // استدعاء الدالة عند تحميل الصفحة
+        window.addEventListener('DOMContentLoaded', function() {
+            addCorsProxyButton();
+        });
+
+        // تحسين دالة addBotToList لإضافة عناصر حالة البوت
+        function addBotToList(botId, botInfo) {
+            const botList = document.getElementById('botList');
+            
+            const botItem = document.createElement('div');
+            botItem.className = 'bot-item';
+            botItem.id = `bot-${botId}`;
+            
+            botItem.innerHTML = `
+                <div class="bot-info">
+                    <div class="bot-name">${botInfo.first_name} (@${botInfo.username})</div>
+                    <div class="bot-status">
+                        <div id="bot-status-${botId}" class="status-indicator status-active"></div>
+                        <span id="bot-status-text-${botId}">نشط</span>
+                    </div>
+                </div>
+                <div class="bot-actions">
+                    <button class="btn-small" onclick="showBotDetails('${botId}')">التفاصيل</button>
+                    <button class="btn-small" onclick="updateBot('${botId}')">تحديث</button>
+                    <button class="btn-small btn-export" onclick="exportBotConfig('${botId}')">تصدير</button>
+                    <button class="btn-small btn-danger" onclick="stopBot('${botId}')">إيقاف</button>
+                </div>
+            `;
+            
+            botList.appendChild(botItem);
+        }
+
+        // تعريف المتغيرات العامة
+        const activeBots = {}; // تعريف كائن لتخزين البوتات النشطة
+        let currentBotId = null; // تعريف متغير لتخزين معرف البوت الحالي
+        const userMemories = {}; // كائن لتخزين ذاكرة المستخدمين
+        let connectionMethod = 'direct'; // طريقة الاتصال (مباشر، وكيل CORS، وكيل محلي)
+        
+        // دالة لتبديل علامات التبويب
+        function switchTab(tabId) {
+            // إخفاء جميع محتويات علامات التبويب
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // إزالة الفئة النشطة من جميع علامات التبويب
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // إظهار محتوى علامة التبويب المحددة
+            document.getElementById(`${tabId}-content`).style.display = 'block';
+            
+            // إضافة الفئة النشطة إلى علامة التبويب المحددة
+            document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
+        }
+
+        function handleConnectionError(error, token) {
+            const errorMessage = error.message || 'خطأ غير معروف';
+            
+            if (errorMessage.includes('Failed to fetch') || errorMessage.includes('NetworkError')) {
+                addLog('خطأ في الاتصال بخوادم تليجرام. قد يكون هناك مشكلة في الشبكة أو حظر للوصول.', 'error');
+                addLog('حلول مقترحة:', 'info');
+                addLog('1. تحقق من اتصالك بالإنترنت.', 'info');
+                addLog('2. جرب استخدام وكيل CORS بالنقر على زر "تفعيل وكيل CORS".', 'info');
+                addLog('3. قم بتنزيل كود الخادم وتشغيله على استضافتك.', 'info');
+                
+                // إظهار زر وكيل CORS
+                const corsButton = document.getElementById('corsProxyButton');
+                if (corsButton) {
+                    corsButton.style.display = 'block';
+                }
+            } else if (errorMessage.includes('401') || errorMessage.includes('Unauthorized')) {
+                addLog('خطأ: توكن التليجرام غير صالح. تأكد من إدخال التوكن الصحيح.', 'error');
+            } else if (errorMessage.includes('400') || errorMessage.includes('Bad Request')) {
+                addLog('خطأ في طلب واجهة برمجة التطبيقات. تأكد من صحة المعلمات المرسلة.', 'error');
+            } else {
+                addLog(`خطأ: ${errorMessage}`, 'error');
+            }
+            
+            // إضافة زر لإعادة المحاولة
+            const retryButton = document.createElement('button');
+            retryButton.className = 'btn btn-primary';
+            retryButton.textContent = 'إعادة المحاولة';
+            retryButton.onclick = () => {
+                retryButton.remove();
+                setupBot(token, document.getElementById('geminiToken').value, document.getElementById('systemInstruction').value);
+            };
+            
+            document.getElementById('logs').appendChild(retryButton);
+        }
+
+        function setupAutoRecovery(botId) {
+            const bot = activeBots[botId];
+            if (!bot) return;
+            
+            // إيقاف أي مؤقت سابق
+            if (bot.recoveryTimer) {
+                clearInterval(bot.recoveryTimer);
+            }
+            
+            // إعداد مؤقت للتحقق من حالة البوت كل دقيقة
+            bot.recoveryTimer = setInterval(async () => {
+                try {
+                    // التحقق من حالة البوت
+                    const response = await fetch(`https://api.telegram.org/bot${bot.token}/getMe`);
+                    const data = await response.json();
+                    
+                    if (!data.ok) {
+                        addLog(`تم اكتشاف مشكلة في البوت ${botId}. جاري إعادة التشغيل...`, 'warning');
+                        await setupBot(bot.token, bot.geminiToken, bot.systemInstruction, bot.settings);
+                    }
+                } catch (error) {
+                    addLog(`خطأ في التحقق من حالة البوت ${botId}: ${error.message}`, 'error');
+                }
+            }, 60000); // كل دقيقة
+        }
+
+        function setupMemoryCleanup() {
+            // إيقاف أي مؤقت سابق
+            if (window.memoryCleanupTimer) {
+                clearInterval(window.memoryCleanupTimer);
+            }
+            
+            // إعداد مؤقت لتنظيف الذاكرة كل ساعة
+            window.memoryCleanupTimer = setInterval(() => {
+                const now = Date.now();
+                let cleanedCount = 0;
+                
+                // تنظيف ذاكرة المستخدمين غير النشطين (أكثر من 24 ساعة)
+                for (const botId in userMemories) {
+                    for (const userId in userMemories[botId]) {
+                        const lastActivity = userMemories[botId][userId].lastActivity || 0;
+                        if (now - lastActivity > 24 * 60 * 60 * 1000) { // 24 ساعة
+                            delete userMemories[botId][userId];
+                            cleanedCount++;
+                        }
+                    }
+                }
+                
+                if (cleanedCount > 0) {
+                    addLog(`تم تنظيف ذاكرة ${cleanedCount} مستخدم غير نشط`, 'info');
+                }
+            }, 60 * 60 * 1000); // كل ساعة
+        }
+    </script>
+</body>
+</html>
